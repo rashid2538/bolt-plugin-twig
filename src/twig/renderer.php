@@ -1,0 +1,37 @@
+<?php
+
+    namespace BoltPlugin\Twig;
+
+    use Bolt\IPlugin;
+    use Bolt\Component;
+    use Twig\Loader\FilesystemLoader;
+    use Twig\Environment;
+
+    class Renderer extends Component implements IPlugin {
+
+        function activate() {
+            $this->on( 'getRenderer', [ $this, 'getRenderer' ] );
+        }
+        
+        function getRenderer() {
+			return function() {
+
+                $viewsFolder = __DIR__ . '/../../' . $this->getConfig( 'defaults/viewPath', 'application/view/' );
+                $loader = new FilesystemLoader([
+                    $viewsFolder . $this->getName() . '/',
+                    $viewsFolder
+                ]);
+                $loader = $this->trigger( 'twigLoaderInitialized', $loader );
+                $caching = $this->getConfig( 'twig/cache', sys_get_temp_dir() );
+                $twig = new Environment( $loader, [
+                    'debug' => $this->getConfig( 'twig/debug', false ),
+                    'cache' => $caching
+                ]);
+                $twig->addGlobal( 'view', $this );
+                $params = ( array )$this->getViewBag();
+                $params[ 'model' ] = $this->model;
+                $twig = $this->trigger( 'twigEnvironmentInitialized', $twig );
+                return $twig->render( str_replace( $this->getConfig( 'defaults/viewPath', 'application/view/' ), '', $this->template ), $params );
+            };
+		}
+    }
