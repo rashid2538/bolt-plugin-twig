@@ -16,7 +16,7 @@
         function getRenderer() {
 			return function() {
 
-                $viewsFolder = __DIR__ . '/../../' . $this->getConfig( 'defaults/viewPath', 'application/view/' );
+                $viewsFolder = $this->getConfig( 'defaults/viewPath', __DIR__ . '/../../' . 'application/view/' );
                 $loader = new FilesystemLoader([
                     $viewsFolder . $this->getName() . '/',
                     $viewsFolder
