@@ -23,10 +23,12 @@
                 ]);
                 $loader = $this->trigger( 'twigLoaderInitialized', $loader );
                 $caching = $this->getConfig( 'twig/cache', sys_get_temp_dir() );
+                $debug = $this->getConfig( 'twig/debug', false );
                 $twig = new Environment( $loader, [
-                    'debug' => $this->getConfig( 'twig/debug', false ),
+                    'debug' => $debug,
                     'cache' => $caching
                 ]);
+                $debug && $twig->addExtension( new \Twig\Extension\DebugExtension() );
                 $twig->addGlobal( 'view', $this );
                 $params = ( array )$this->getViewBag();
                 $params[ 'model' ] = $this->model;
